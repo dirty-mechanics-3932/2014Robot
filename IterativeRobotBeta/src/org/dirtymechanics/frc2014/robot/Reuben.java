@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.dirtymechanics.frc2014.library.JaguarPair;
 import org.dirtymechanics.frc2014.library.SmartJoystick;
+import org.dirtymechanics.frc2014.library.UltrasonicSensor;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -47,7 +49,9 @@ public class Reuben extends IterativeRobot {
     private final SmartJoystick rightStick;
     private final SmartJoystick gamepad;
     
-    private final int distanceInInches;
+    private final UltrasonicSensor distance;
+    
+    private int distanceInInches = 0;
     
     public Reuben() {
         leftStick = new SmartJoystick(1);
@@ -69,6 +73,8 @@ public class Reuben extends IterativeRobot {
         
         shooterSpinner = new Victor(7);
         
+        distance = new UltrasonicSensor(1);
+        
         
         
     }
@@ -89,6 +95,14 @@ public class Reuben extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+        leftPair.set(leftStick.getY());
+        rightPair.set(rightStick.getY());
+        
+        SmartDashboard.putString("Distance", distance.getReadable());
+        
+        if(leftStick.getRawButton(1)) doubleTest.set(DoubleSolenoid.Value.kForward);
+        else if (leftStick.getRawButton(2)) doubleTest.set(DoubleSolenoid.Value.kReverse);
+        else doubleTest.set(DoubleSolenoid.Value.kOff);
         
     }
     

@@ -30,4 +30,8 @@ public class UltrasonicSensor {
     public double getFeet(){
         return this.getInches() / 12.0;
     }
+    
+    public String getReadable(){
+        return (int)getFeet() + "' " + (int)(getInches() - (int)getFeet()*12) + "\"";
+    }
 }
