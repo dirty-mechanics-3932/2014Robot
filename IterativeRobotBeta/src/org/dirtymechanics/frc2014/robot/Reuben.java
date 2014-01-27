@@ -98,12 +98,29 @@ public class Reuben extends IterativeRobot {
         leftPair.set(leftStick.getY());
         rightPair.set(rightStick.getY());
         
-        SmartDashboard.putString("Distance", distance.getReadable());
+        SmartDashboard.putNumber("Distance", distance.getInches());
         
         if(leftStick.getRawButton(1)) doubleTest.set(DoubleSolenoid.Value.kForward);
         else if (leftStick.getRawButton(2)) doubleTest.set(DoubleSolenoid.Value.kReverse);
         else doubleTest.set(DoubleSolenoid.Value.kOff);
         
+        /*
+        if(distance.getInches() > 45 && distance.getInches() < 51)
+        {
+        	//set LED appropriately 
+        }
+        else if(distance.getInches() > 69 && distance.getInches() < 75)
+        {
+        	//set LED
+        }
+        else if(distance.getInches() > 93 && distance.getInches() < 99)
+        {
+        	//set LED
+        }
+        else {
+        	//implement feedback to driver?
+        }
+        */
     }
     
     /**
