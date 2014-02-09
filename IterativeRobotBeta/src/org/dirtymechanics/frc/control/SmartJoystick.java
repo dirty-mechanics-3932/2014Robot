@@ -12,7 +12,7 @@ public class SmartJoystick extends Joystick {
     /**
      * An array of all possible buttons to press.
      */
-    private final ToggleButton[] buttons;
+    private final Button[] buttons;
 
     /**
      * @param port The USB port the joystick is connected to.
@@ -41,15 +41,36 @@ public class SmartJoystick extends Joystick {
     public void update() {
         for (int i = 0; i < buttons.length; ++i) {
             if (buttons[i] != null) {
-                buttons[i].update(getRawButton(i));
+                buttons[i].changeState(getRawButton(i));
             }
         }
     }
 
     /**
+     * Skeleton class used to define <CODE>Button</CODE> objects for
+     * <CODE>SmartJoystick</CODE>.
+     */
+    public static abstract class Button {
+
+        /**
+         * Called per cycle to update the state of the button from the joystick.
+         *
+         * @param state The new state of the button.
+         */
+        protected abstract void update(boolean state);
+
+        /**
+         * Called when the button is updated.
+         *
+         * @param state The new state of the button.
+         */
+        protected abstract void changeState(boolean state);
+    }
+
+    /**
      * Represents a toggle button.
      */
-    public static abstract class ToggleButton {
+    public static abstract class ToggleButton extends Button {
 
         /**
          * The current state of the switch.
@@ -86,7 +107,7 @@ public class SmartJoystick extends Joystick {
          *
          * @param state The current state of the button.
          */
-        private void update(boolean state) {
+        protected void update(boolean state) {
             if (lastState != state) {
                 if (flip++ % 2 == 0) {
                     state = !state;
@@ -95,13 +116,6 @@ public class SmartJoystick extends Joystick {
             }
             lastState = state;
         }
-        
-        /**
-         * Called when the toggle state changes.
-         * 
-         * @param state The current state.
-         */
-        protected abstract void changeState(boolean state);
 
         /**
          * The state of the toggle button, default state is false;
@@ -113,34 +127,23 @@ public class SmartJoystick extends Joystick {
         }
     }
 
-    public static abstract class StandardButton {
+    public static abstract class StandardButton extends Button {
+
         /**
          * The last state.
          */
         private boolean lastState;
-        
-        /**
-         * The current state.
-         */
-        private boolean state;
 
         /**
          * Updates the state of the switch.
          *
          * @param state The current state of the button.
          */
-        private void update(boolean state) {
+        protected void update(boolean state) {
             if (lastState != state && state) {
                 changeState(state);
             }
             lastState = state;
         }
-        
-        /**
-         * Called when the toggle state changes.
-         * 
-         * @param state The current state.
-         */
-        protected abstract void changeState(boolean state);
     }
 }
