@@ -26,8 +26,9 @@ public class Stitch extends IterativeRobot {
     
     /* A regular jostick to use for testing instead of Dan's SmartJoysticks*/
     private final Joystick mainTestController;
-    private final Jaguar leftDrive;
-    private final Jaguar rightDrive;
+    private final Joystick mainTestController2;
+    private final Jaguar rotationalEncoderJaguar;
+    private final Jaguar stringEncoderJaguar;
     private final Jaguar armDrive;
     private final Relay distanceLight;
     private final Relay pneumaticRelay1; //Two pheumatic relays for the shooter that
@@ -37,6 +38,7 @@ public class Stitch extends IterativeRobot {
     private final RotationalEncoder rotateEncoder;
     private final DigitalInput limitSwitch;
     private long lastFireTime;
+    private boolean resettingTo60;
     
     public Stitch() {
         compressor = new Compressor(1, 6);
@@ -44,11 +46,13 @@ public class Stitch extends IterativeRobot {
         //rightStick = new SmartJoystick(2);
         //armController = new SmartJoystick(3);
         mainTestController = new Joystick(1);
+        mainTestController2 = new Joystick(2);
         ultrasonicSensor = new UltrasonicSensor(1);
         stringEncoder = new StringEncoder();
         rotateEncoder = new RotationalEncoder();
-        leftDrive = new Jaguar(1);
-        rightDrive = new Jaguar(2);
+        
+        rotationalEncoderJaguar = new Jaguar(1);
+        stringEncoderJaguar = new Jaguar(2);
         armDrive = new Jaguar(3);
         
         //Distance light circuit is on Spike 5
@@ -82,6 +86,15 @@ public class Stitch extends IterativeRobot {
         if(!limitSwitch.get()){
             fireDualPneumatic();
         }
+        
+        adjustFirePower();
+        adjustFireAngle();
+        if(mainTestController.getRawButton(2)) {
+            resettingTo60 = true;
+        }
+        if(resettingTo60) {
+            goTo60();
+        }
         //print current values from all sensors
         SmartDashboard.putString("Distance to target: ", ultrasonicSensor.getReadable());
         SmartDashboard.putString("String encoder distance: ", "" + stringEncoder.getDistance());
@@ -91,17 +104,66 @@ public class Stitch extends IterativeRobot {
         ultrasonicSensor.setLightState(distanceLight);
     }
     
-    /** This method will most likely be rendered obsolete when we use a single
+    /** 
+     * @author Nick
+     * This method will most likely be rendered obsolete when we use a single
      *  pneumatic to click the seatbelt instead of a dual one.
      */
-    public void fireDualPneumatic() {
+    private void fireDualPneumatic() {
         if(lastFireTime - System.currentTimeMillis() < -3000) {
             lastFireTime = System.currentTimeMillis();
-            pneumaticRelay1.set(Relay.Value.kForward);
-            pneumaticRelay2.set(Relay.Value.kOn);
-            Timer.delay(0.05);
             pneumaticRelay1.set(Relay.Value.kOn);
             pneumaticRelay2.set(Relay.Value.kForward);
+            Timer.delay(0.05);
+            pneumaticRelay1.set(Relay.Value.kForward);
+            pneumaticRelay2.set(Relay.Value.kOn);
         }
+    }
+    
+    /**
+     * @author Nick
+     * resets the angle to 60(+-10) degrees
+     */
+    private void goTo60() {
+        if(rotateEncoder.getDegrees() > 60) {
+            rotationalEncoderJaguar.set(-.3);
+        } else if(rotateEncoder.getDegrees() < 60) {
+            rotationalEncoderJaguar.set(.3);
+        } else {
+            resettingTo60 = false;
+        }
+    }
+    
+    /**
+     * @author Nick
+     * The purpose of this method is to check if whether or not we're above
+     * or below 120 or 0 degrees respectively.
+     * 
+     * TODO: CHECKING ABOVE/BELOW IS NOT WORKING
+     */
+    private void adjustFireAngle() {
+        if(!resettingTo60) {
+            if(mainTestController.getY() < 0) {
+                if(rotateEncoder.getDegrees() < 120) {
+                    rotationalEncoderJaguar.set(mainTestController.getY());
+                }
+            } else if(mainTestController.getY() > 0) {
+                if(rotateEncoder.getDegrees() > 0) {
+                    rotationalEncoderJaguar.set(mainTestController.getY());
+                }
+            }
+        
+        }
+    }
+    
+    /**
+     * @author Nick
+     * Move the jaguar inside the range of 6-21 as read by
+     * the String encoder.
+     * 
+     * TODO: Check whether or not the encoder is in range.
+     */
+    private void adjustFirePower() {
+        stringEncoderJaguar.set(mainTestController2.getY());
     }
 }
