@@ -38,7 +38,7 @@ public class Stitch extends IterativeRobot {
     private final RotationalEncoder rotateEncoder;
     private final DigitalInput limitSwitch;
     private long lastFireTime;
-    private boolean resettingTo60;
+    private boolean movingTo60;
     
     public Stitch() {
         compressor = new Compressor(1, 6);
@@ -90,9 +90,9 @@ public class Stitch extends IterativeRobot {
         adjustFirePower();
         adjustFireAngle();
         if(mainTestController.getRawButton(2)) {
-            resettingTo60 = true;
+            movingTo60 = true;
         }
-        if(resettingTo60) {
+        if(movingTo60) {
             goTo60();
         }
         //print current values from all sensors
@@ -130,7 +130,7 @@ public class Stitch extends IterativeRobot {
         } else if(rotateEncoder.getDegrees() < 60) {
             rotationalEncoderJaguar.set(.3);
         } else {
-            resettingTo60 = false;
+            movingTo60 = false;
         }
     }
     
@@ -139,10 +139,10 @@ public class Stitch extends IterativeRobot {
      * The purpose of this method is to check if whether or not we're above
      * or below 120 or 0 degrees respectively.
      * 
-     * TODO: CHECKING ABOVE/BELOW IS NOT WORKING
+     * TODO: RANGE CHECKING ABOVE/BELOW IS NOT WORKING
      */
     private void adjustFireAngle() {
-        if(!resettingTo60) {
+        if(!movingTo60) {
             if(mainTestController.getY() < 0) {
                 if(rotateEncoder.getDegrees() < 120) {
                     rotationalEncoderJaguar.set(mainTestController.getY());
