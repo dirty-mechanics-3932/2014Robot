@@ -34,7 +34,6 @@ public class Stitch extends IterativeRobot {
     private final RotationalEncoder rotateEncoder;
 
     public Stitch() {
-
         compressor = new Compressor(1, 6);
 
         leftStick = new SmartJoystick(1);
@@ -49,6 +48,7 @@ public class Stitch extends IterativeRobot {
         rightDrive = new Jaguar(2);
         armDrive = new Jaguar(3);
         
+        //Distance light circuit is on Spike 5
         distanceLight = new Relay(5);
     }
 
@@ -69,6 +69,7 @@ public class Stitch extends IterativeRobot {
         SmartDashboard.putString("String encoder distance: ", "" + stringEncoder.getDistance());
         SmartDashboard.putString("Rotational encoder degrees: ", "" + rotateEncoder.getDegrees());
         
-        int success = ultrasonicSensor.setLightState(distanceLight);
+        //updates distance lights on robot
+        ultrasonicSensor.setLightState(distanceLight);
     }
 }

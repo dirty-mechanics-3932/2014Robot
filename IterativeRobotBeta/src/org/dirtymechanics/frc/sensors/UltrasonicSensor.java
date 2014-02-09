@@ -43,7 +43,7 @@ public class UltrasonicSensor {
         return (int)getFeet() + "' " + (int)(getInches() - (int)getFeet()*12) + "\"";
     }
     
-    public int setLightState(Relay distanceLight) {
+    public void setLightState(Relay distanceLight) {
         //takes a relay as input and changes the values depending on distance to target
         
         if(this.getInches() > 45 && this.getInches() < 51) {
@@ -58,6 +58,5 @@ public class UltrasonicSensor {
         else {
         distanceLight.set(Relay.Value.kOff);
         }
-        return 0;
     }
 }
