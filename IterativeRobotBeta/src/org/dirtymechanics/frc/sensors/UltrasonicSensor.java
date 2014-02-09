@@ -1,6 +1,7 @@
 package org.dirtymechanics.frc.sensors;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
+import edu.wpi.first.wpilibj.Relay;
 
 /**
  *
@@ -40,5 +41,23 @@ public class UltrasonicSensor {
     
     public String getReadable(){
         return (int)getFeet() + "' " + (int)(getInches() - (int)getFeet()*12) + "\"";
+    }
+    
+    public int setLightState(Relay distanceLight) {
+        //takes a relay as input and changes the values depending on distance to target
+        
+        if(this.getInches() > 45 && this.getInches() < 51) {
+        distanceLight.set(Relay.Value.kForward);
+        }
+        else if(this.getInches() > 69 && this.getInches() < 75) {
+        distanceLight.set(Relay.Value.kReverse);
+        }
+        else if(this.getInches() > 93 && this.getInches() < 99) {
+        distanceLight.set(Relay.Value.kOn);
+        }
+        else {
+        distanceLight.set(Relay.Value.kOff);
+        }
+        return 0;
     }
 }

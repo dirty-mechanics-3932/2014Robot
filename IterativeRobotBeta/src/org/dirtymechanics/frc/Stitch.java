@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Relay;
 
 import org.dirtymechanics.frc.control.SmartJoystick;
 import org.dirtymechanics.frc.sensors.RotationalEncoder;
@@ -25,10 +26,12 @@ public class Stitch extends IterativeRobot {
     private final Jaguar leftDrive;
     private final Jaguar rightDrive;
     private final Jaguar armDrive;
+    
+    private final Relay distanceLight;
 
-    //private final UltrasonicSensor ultrasonicSensor;
+    private final UltrasonicSensor ultrasonicSensor;
     private final StringEncoder stringEncoder;
-    private final RotationalEncoder rotEncoder;
+    private final RotationalEncoder rotateEncoder;
 
     public Stitch() {
 
@@ -38,13 +41,15 @@ public class Stitch extends IterativeRobot {
         rightStick = new SmartJoystick(2);
 
         armController = new SmartJoystick(3);
-        //ultrasonicSensor = new UltrasonicSensor(1);
+        ultrasonicSensor = new UltrasonicSensor(1);
         stringEncoder = new StringEncoder();
-        rotEncoder = new RotationalEncoder();
+        rotateEncoder = new RotationalEncoder();
 
         leftDrive = new Jaguar(1);
         rightDrive = new Jaguar(2);
         armDrive = new Jaguar(3);
+        
+        distanceLight = new Relay(5);
     }
 
     public void robotInit() {
@@ -52,13 +57,18 @@ public class Stitch extends IterativeRobot {
     }
 
     public void teleopPeriodic() {
+        //update drivetrain and arm
         leftStick.update();
         rightStick.update();
         leftDrive.set(leftStick.getY());
         rightDrive.set(rightStick.getY());
         armDrive.set(armController.getY());
-        //SmartDashboard.putString("Distance to target:", ultrasonicSensor.getReadable());
-        SmartDashboard.putString("String Encoder dist:", "" + stringEncoder.getDistance());
-        SmartDashboard.putString("Rot Encoder degrees:", "" + rotEncoder.getDegrees());
+        
+        //print current values from all sensors
+        SmartDashboard.putString("Distance to target: ", ultrasonicSensor.getReadable());
+        SmartDashboard.putString("String encoder distance: ", "" + stringEncoder.getDistance());
+        SmartDashboard.putString("Rotational encoder degrees: ", "" + rotateEncoder.getDegrees());
+        
+        int success = ultrasonicSensor.setLightState(distanceLight);
     }
 }
