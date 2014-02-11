@@ -8,11 +8,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Servo;
 
-//import org.dirtymechanics.frc.control.SmartJoystick;
+import org.dirtymechanics.frc.control.SmartJoystick;
 import org.dirtymechanics.frc.sensors.RotationalEncoder;
 import org.dirtymechanics.frc.sensors.StringEncoder;
 import org.dirtymechanics.frc.sensors.UltrasonicSensor;
+import org.dirtymechanics.frc.sensors.Camera;
 
 /**
  *
@@ -20,36 +22,50 @@ import org.dirtymechanics.frc.sensors.UltrasonicSensor;
 public class Stitch extends IterativeRobot {
     
     private final Compressor compressor;
-    //private final SmartJoystick leftStick;
-    //private final SmartJoystick rightStick;
-    //private final SmartJoystick armController;
+    private final SmartJoystick leftStick;
+    private final SmartJoystick rightStick;
+    private final SmartJoystick armController;
     
     /* A regular jostick to use for testing instead of Dan's SmartJoysticks*/
     private final Joystick mainTestController;
     private final Joystick mainTestController2;
+    
     private final Jaguar rotationalEncoderJaguar;
     private final Jaguar stringEncoderJaguar;
     private final Jaguar armDrive;
+    
     private final Relay distanceLight;
     private final Relay pneumaticRelay1; //Two pheumatic relays for the shooter that
     private final Relay pneumaticRelay2; //will probably be replaced by a single relay
+    
     private final UltrasonicSensor ultrasonicSensor;
     private final StringEncoder stringEncoder;
     private final RotationalEncoder rotateEncoder;
     private final DigitalInput limitSwitch;
+    
+    private final Servo cameraUpDown;
+    private final Servo cameraLeftRight;
+    private final Camera camera;
+    
     private long lastFireTime;
     private boolean movingTo60;
+    private boolean isAutoOn;
     
     public Stitch() {
         compressor = new Compressor(1, 6);
-        //leftStick = new SmartJoystick(1);
-        //rightStick = new SmartJoystick(2);
-        //armController = new SmartJoystick(3);
+        leftStick = new SmartJoystick(1);
+        rightStick = new SmartJoystick(2);
+        armController = new SmartJoystick(3);
         mainTestController = new Joystick(1);
         mainTestController2 = new Joystick(2);
         ultrasonicSensor = new UltrasonicSensor(1);
         stringEncoder = new StringEncoder();
         rotateEncoder = new RotationalEncoder();
+        
+        cameraUpDown = new Servo(1);
+        cameraLeftRight = new Servo(2);
+        camera = new Camera();
+        camera.StartCamera();
         
         rotationalEncoderJaguar = new Jaguar(1);
         stringEncoderJaguar = new Jaguar(2);
@@ -67,6 +83,12 @@ public class Stitch extends IterativeRobot {
         compressor.start();
     }
 
+    public void autonomousPeriodic()
+    {
+        isAutoOn = isAutonomous();
+        camera.autonomousVision(isAutoOn);
+    }
+    
     public void teleopPeriodic() {
         /**update drivetrain and arm
          * 
