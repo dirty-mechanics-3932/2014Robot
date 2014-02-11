@@ -1,0 +1,57 @@
+Mitt Algorithm:
+
+To Start:
+    Close Mitt
+
+At all cycles:
+    If Grabber Button is pressed:
+        Close Mitt
+    If Release Button is pressed:
+        Open Mitt
+    If State = Chase AND limit switch L is on:
+        If L was on a few cycles ago:  <-- Debounce
+            Close Mitt
+    If Chase Button is pressed:
+        State = Chase
+        Open Mitt
+
+Close Mitt:
+    If Mitt State = Open:
+        All Mitt Pneumatics ON
+        Rollers OFF
+
+Open Mitt:
+    If Mitt State = Closed:
+        All Mitt Pneumatics OFF
+        Rollers ON
+
+
+
+Shooter Algorithm:
+
+To Start:
+    Motor BACK until LIMIT = DISTANCE MAX
+
+At All Cycles:
+
+Display Motor's Distance
+Display Shooting Distance calculated from Motor's Distance via a lookup table
+Motor = Controller's Y UNLESS:
+
+Shoot Button Pressed:
+    Trigger Cycle
+    Motor = FORWARD until LIMIT = CARRIAGE REST
+    Indicate ready again
+
+
+Preset Button Pressed:
+    Loop:
+        If Motor BEHIND Preset: Motor Forward
+        Else Motor Back
+    until Motor = Preset
+    Indicate that Preset was reached
+
+Shoot-At Button Pressed:
+    Shooting distance = Motor's Distance via lookup table
+    Move to shooting distance
+    Shoot
