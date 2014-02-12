@@ -43,8 +43,8 @@ public class Stitch extends IterativeRobot {
     private final RotationalEncoder rotateEncoder;
     private final DigitalInput limitSwitch;
     
-    private final Servo cameraUpDown;
-    private final Servo cameraLeftRight;
+    //private final Servo cameraUpDown;
+    //private final Servo cameraLeftRight;
     private final Camera camera;
     
     private long lastFireTime;
@@ -62,8 +62,8 @@ public class Stitch extends IterativeRobot {
         stringEncoder = new StringEncoder();
         rotateEncoder = new RotationalEncoder();
         
-        cameraUpDown = new Servo(1);
-        cameraLeftRight = new Servo(2);
+        //cameraUpDown = new Servo(1);
+        //cameraLeftRight = new Servo(2);
         camera = new Camera();
         camera.StartCamera();
         
@@ -118,9 +118,10 @@ public class Stitch extends IterativeRobot {
             goTo60();
         }
         //print current values from all sensors
-        SmartDashboard.putString("Distance to target: ", ultrasonicSensor.getReadable());
-        SmartDashboard.putString("String encoder distance: ", "" + stringEncoder.getDistance());
-        SmartDashboard.putString("Rotational encoder degrees: ", "" + rotateEncoder.getDegrees());
+        SmartDashboard.putString("Distance to target:", ultrasonicSensor.getReadable());
+        SmartDashboard.putString("String encoder distance:", "" + stringEncoder.getDistance());
+        SmartDashboard.putString("Rotational encoder degrees:", "" + rotateEncoder.getDegrees());
+        SmartDashboard.putString("Limit switch state:", "" + limitSwitch.get());
         
         //updates distance lights on robot
         ultrasonicSensor.setLightState(distanceLight);

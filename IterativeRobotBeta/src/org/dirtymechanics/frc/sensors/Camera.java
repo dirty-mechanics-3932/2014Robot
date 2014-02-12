@@ -8,6 +8,7 @@ package org.dirtymechanics.frc.sensors;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
+import edu.wpi.first.wpilibj.camera.AxisCameraException;
 import edu.wpi.first.wpilibj.image.*;
 import edu.wpi.first.wpilibj.image.NIVision.MeasurementType;
 
@@ -59,7 +60,7 @@ public class Camera {
     };
     
     public void StartCamera() {
-        //camera = AxisCamera.getInstance();  // get an instance of the camera
+        camera = AxisCamera.getInstance();  // get an instance of the camera
         cc = new CriteriaCollection();      // create the criteria for the particle filter
         cc.addCriteria(MeasurementType.IMAQ_MT_AREA, AREA_MINIMUM, 65535, false);
     }
@@ -78,9 +79,9 @@ public class Camera {
                  * level directory in the flash memory on the cRIO. The file name in this case is "testImage.jpg"
                  * 
                  */
-                //ColorImage image = camera.getImage();     // comment if using stored images
-                ColorImage image;                           // next 2 lines read image from flash on cRIO
-                image = new RGBImage("/testImage.jpg");		// get the sample image from the cRIO flash
+                ColorImage image = camera.getImage();     // comment if using stored images
+                //ColorImage image;                           // next 2 lines read image from flash on cRIO
+                //image = new RGBImage("/testImage.jpg");		// get the sample image from the cRIO flash
                 BinaryImage thresholdImage = image.thresholdHSV(105, 137, 230, 255, 133, 183);   // keep only green objects
                 //thresholdImage.write("/threshold.bmp");
                 BinaryImage filteredImage = thresholdImage.particleFilter(cc);           // filter out small particles
@@ -186,11 +187,11 @@ public class Camera {
                 thresholdImage.free();
                 image.free();
                 
-//            } catch (AxisCameraException ex) {        // this is needed if the camera.getImage() is called
-//                ex.printStackTrace();
+            } catch (AxisCameraException ex) {        // this is needed if the camera.getImage() is called
+                ex.printStackTrace();
             } catch (NIVisionException ex) {
                 ex.printStackTrace();
-            }
+            }            
         }
     }
     
