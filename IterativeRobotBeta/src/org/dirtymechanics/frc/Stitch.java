@@ -19,6 +19,12 @@ import org.dirtymechanics.frc.sensors.Camera;
  *
  */
 public class Stitch extends IterativeRobot {
+    
+    //Please define meaningful constants for values instead of inlining
+    //  numbers in the code.
+    public static final int COMPRESSOR_RELAY = 6;
+    public static final int COMPRESSOR_PRESSURE_SWITCH_CHANNEL = 1;
+    public static final double ARM_POWER_PERCENTAGE = .8;
 
     private final Compressor compressor;
     private final Joystick leftStick;
@@ -28,6 +34,7 @@ public class Stitch extends IterativeRobot {
     private final Jaguar leftJag;
     private final Jaguar rightJag;
     private final Jaguar screwJag;
+    private final Jaguar armJag;
 
     private final Relay distanceLight;
     private final Relay pneumaticRelay1; //Two pheumatic relays for the shooter that
@@ -37,6 +44,8 @@ public class Stitch extends IterativeRobot {
     private final StringEncoder stringEncoder;
     private final RotationalEncoder rotEncoder;
     private final DigitalInput limitSwitch;
+    
+
 
     //private final Servo cameraUpDown;
     //private final Servo cameraLeftRight;
@@ -48,10 +57,13 @@ public class Stitch extends IterativeRobot {
     private final ScrewPulley pulley;
     private final Relay tranny;
     private final DriveTrain driveTrain;
+    
+    private boolean gear = false;
+    private boolean gearButtonPressed = false;
 
     public Stitch() {
-        compressor = new Compressor(1, 6);
-        leftStick = new Joystick(1);
+        compressor = new Compressor(COMPRESSOR_PRESSURE_SWITCH_CHANNEL, COMPRESSOR_RELAY);
+        leftStick = new Joystick(JOYSTICK_PORT_1);
         rightStick = new Joystick(2);
         armController = new Joystick(3);
         ultrasonicSensor = new UltrasonicSensor(1);
@@ -66,7 +78,8 @@ public class Stitch extends IterativeRobot {
         leftJag = new Jaguar(1);
         rightJag = new Jaguar(2);
         screwJag = new Jaguar(3);
-        tranny = new Relay(1);
+        armJag = new Jaguar(4);
+        tranny = new Relay(3);
         
         driveTrain = new DriveTrain(leftJag, rightJag, tranny);
 
@@ -78,6 +91,8 @@ public class Stitch extends IterativeRobot {
         pulley = new ScrewPulley(leftJag, stringEncoder);
 
     }
+    public static final int JOYSTICK_PORT_1 = 1;
+    
 
     public void robotInit() {
         compressor.start();
@@ -89,7 +104,12 @@ public class Stitch extends IterativeRobot {
     }
 
     public void teleopPeriodic() {
-        boolean gear = true;
+        //This is why we need SmartJoystick and its ToggleButton
+        //Bring back, bring back, bring back my SmartJoystick to me!
+        if (rightStick.getRawButton(2) != gearButtonPressed){
+            gearButtonPressed = !gearButtonPressed;
+            gear = !gear;
+        }
         driveTrain.update(leftStick.getX(), rightStick.getX(), gear);
         //leftDrive.set(leftStick.getY());
         //rightDrive.set(rightStick.getY());
@@ -106,9 +126,11 @@ public class Stitch extends IterativeRobot {
         /*if(mainTestController.getRawButton(2)) {
          movingTo60 = true;
          }*/
-        if (movingTo60) {
-            goTo60();
-        }
+//        if (movingTo60) {
+//            goTo60();
+//        }
+//        
+        armJag.set(armController.getY()*ARM_POWER_PERCENTAGE);
         //print current values from all sensors
         SmartDashboard.putString("Distance to target:", ultrasonicSensor.getReadable());
         SmartDashboard.putString("String encoder distance:", "" + stringEncoder.getDistance());
@@ -118,6 +140,7 @@ public class Stitch extends IterativeRobot {
         //updates distance lights on robot
         ultrasonicSensor.setLightState(distanceLight);
     }
+    
 
     /**
      * @author Nick This method will most likely be rendered obsolete when we
@@ -136,15 +159,15 @@ public class Stitch extends IterativeRobot {
     /**
      * @author Nick resets the angle to 60(+-10) degrees
      */
-    private void goTo60() {
-        if (rotEncoder.getDegrees() > 60) {
-            leftJag.set(-.3);
-        } else if (rotEncoder.getDegrees() < 60) {
-            leftJag.set(.3);
-        } else {
-            movingTo60 = false;
-        }
-    }
+//    private void goTo60() {
+//        if (rotEncoder.getDegrees() > 60) {
+//            leftJag.set(-.3);
+//        } else if (rotEncoder.getDegrees() < 60) {
+//            leftJag.set(.3);
+//        } else {
+//            movingTo60 = false;
+//        }
+//    }
 
     /**
      * @author Nick The purpose of this method is to check if whether or not
